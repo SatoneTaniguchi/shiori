@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>しおり</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="しおり">
+<meta name="theme-color" content="#F3EFE9">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Crect width='180' height='180' rx='40' fill='%235E4B6B'/%3E%3Ctext x='90' y='118' font-size='90' text-anchor='middle' fill='%23F3EFE9' font-family='serif'%3E%E3%81%97%3C/text%3E%3C/svg%3E">
+<link rel="manifest" href="data:application/json,%7B%22name%22%3A%22%E3%81%97%E3%81%8A%E3%82%8A%22%2C%22short_name%22%3A%22%E3%81%97%E3%81%8A%E3%82%8A%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23F3EFE9%22%2C%22theme_color%22%3A%22%235E4B6B%22%2C%22share_target%22%3A%7B%22action%22%3A%22.%22%2C%22method%22%3A%22GET%22%2C%22params%22%3A%7B%22title%22%3A%22title%22%2C%22text%22%3A%22text%22%2C%22url%22%3A%22url%22%7D%7D%7D">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Old+Mincho:wght@400;500;700;900&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F4F1EC;--paper-2:#EAE5DC;--ink:#2B2731;--ink-soft:#7A7480;--ink-faint:#A49DA6;
+    --brand:#5E4B6B;--brand-press:#4A3A55;--card:#FFFFFF;--line:#E6E0D6;--star:#E0A82E;
+    --g-beauty:#C56B8A;--g-treat:#6E86B6;--g-out:#4E8D7C;--g-fashion:#B06A54;--g-life:#7C8A5A;--g-other:#9A8FA6;
+    --shadow:0 1px 3px rgba(43,39,49,.06);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{font-family:"Zen Kaku Gothic New",system-ui,sans-serif;background:var(--paper);color:var(--ink);
+    -webkit-font-smoothing:antialiased;line-height:1.55;padding-bottom:env(safe-area-inset-bottom)}
+  .wrap{max-width:1000px;margin:0 auto;padding:0 14px}
+
+  header{position:sticky;top:0;z-index:40;background:rgba(244,241,236,.9);
+    backdrop-filter:saturate(1.3) blur(12px);border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top)}
+  .head-row{display:flex;align-items:center;gap:10px;padding:11px 0 9px}
+  .brand{font-family:"Zen Old Mincho",serif;font-weight:900;font-size:23px;letter-spacing:.05em;color:var(--brand);line-height:1}
+  .spacer{flex:1}
+  .icon-btn{width:34px;height:34px;border-radius:10px;border:1px solid var(--line);background:var(--card);
+    display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink-soft)}
+  .icon-btn.on{background:var(--ink);color:#fff;border-color:transparent}
+  .sync{font-size:10px;font-weight:700;color:var(--ink-faint);display:flex;align-items:center;gap:4px;margin-right:2px}
+  .sync .led{width:6px;height:6px;border-radius:50%;background:#B8B0A6}
+  .sync.on .led{background:#4E8D7C}.sync.off .led{background:#C9A24B}
+
+  .add-row{display:flex;gap:8px;padding:4px 0 8px}
+  .add-row input{flex:1;border:1px solid var(--line);background:var(--card);border-radius:11px;padding:10px 12px;font-family:inherit;font-size:14px}
+  .add-row input:focus{outline:2px solid var(--brand);border-color:transparent}
+  .btn{border:0;border-radius:11px;background:var(--brand);color:#fff;font-family:inherit;font-weight:700;font-size:14px;padding:0 15px;cursor:pointer;white-space:nowrap}
+  .btn:hover{background:var(--brand-press)}
+
+  /* genre row (always) */
+  .grow{display:flex;gap:7px;overflow-x:auto;padding:2px 0 10px;scrollbar-width:none}
+  .grow::-webkit-scrollbar{display:none}
+  .chip{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:6px 12px;font-size:12.5px;
+    font-weight:700;color:var(--ink-soft);cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:6px;flex:0 0 auto;transition:.14s}
+  .chip .dot{width:8px;height:8px;border-radius:50%}
+  .chip .n{font-size:10.5px;opacity:.6}
+  .chip.on{color:#fff;border-color:transparent;background:var(--ink)}
+  .chip.star{border-color:var(--star);color:#B98A1E}
+  .chip.star.on{background:var(--star);color:#fff;border-color:transparent}
+
+  /* refine bar */
+  .refbar{display:flex;align-items:center;justify-content:space-between;padding:0 2px 8px;min-height:0}
+  .refbar .ctx{font-size:12px;color:var(--ink-faint);font-weight:700}
+  .refbtn{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:700;color:var(--brand);
+    background:none;border:0;cursor:pointer;padding:4px 2px}
+  .refbtn svg{width:13px;height:13px;transition:transform .2s}
+  .refbtn.open svg{transform:rotate(180deg)}
+  .panel{max-height:0;overflow:hidden;transition:max-height .25s ease}
+  .panel.open{max-height:200px}
+  .panel .lab{font-size:10px;font-weight:700;letter-spacing:.1em;color:var(--ink-faint);margin:2px 2px 5px}
+  .prow{display:flex;gap:6px;overflow-x:auto;padding-bottom:9px;scrollbar-width:none}
+  .prow::-webkit-scrollbar{display:none}
+  .schip{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:5px 11px;font-size:12px;font-weight:700;color:var(--ink-soft);cursor:pointer;white-space:nowrap;flex:0 0 auto;display:flex;gap:5px;align-items:center}
+  .schip .n{font-size:10px;opacity:.6}
+  .schip.on{background:var(--brand);color:#fff;border-color:transparent}
+
+  /* gallery: compact uniform grid */
+  #board{padding:4px 0 44px}
+  .gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  @media(min-width:520px){.gallery{grid-template-columns:repeat(4,1fr);gap:12px}}
+  @media(min-width:780px){.gallery{grid-template-columns:repeat(5,1fr)}}
+  .card{background:var(--card);border-radius:13px;overflow:hidden;box-shadow:var(--shadow);border:1px solid var(--line);
+    cursor:pointer;position:relative;transition:transform .14s, box-shadow .14s;animation:pop .25s ease both}
+  .card:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(43,39,49,.1)}
+  @keyframes pop{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+  .thumb{position:relative;aspect-ratio:1/1;overflow:hidden}
+  .thumb .wash{position:absolute;inset:0}
+  .thumb .glyph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:30px;opacity:.9}
+  .thumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .starbtn{position:absolute;top:6px;right:6px;z-index:3;width:27px;height:27px;border-radius:50%;border:0;
+    background:rgba(255,255,255,.86);cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 5px rgba(0,0,0,.14)}
+  .starbtn svg{width:14px;height:14px}
+  .body{padding:8px 9px 10px}
+  .glabel{display:flex;align-items:center;gap:4px;font-size:9.5px;font-weight:700;color:var(--ink-faint);margin-bottom:3px}
+  .glabel .dot{width:6px;height:6px;border-radius:50%}
+  .title{font-weight:700;font-size:12px;line-height:1.35;color:var(--ink);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+
+  /* list view */
+  .list{display:flex;flex-direction:column;gap:8px}
+  .list .card{display:flex;border-radius:12px}
+  .list .thumb{width:78px;height:78px;aspect-ratio:auto;flex:0 0 auto}
+  .list .glyph{font-size:24px}.list .starbtn{width:24px;height:24px;top:5px;right:5px}
+  .list .body{flex:1;padding:9px 11px;min-width:0;display:flex;flex-direction:column;justify-content:center}
+  .list .title{font-size:13.5px;-webkit-line-clamp:2}
+  .list .cap{font-size:11.5px;color:var(--ink-soft);margin-top:3px;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
+
+  .empty{grid-column:1/-1;text-align:center;padding:56px 20px;color:var(--ink-soft)}
+  .empty .big{font-family:"Zen Old Mincho";font-size:18px;color:var(--ink);margin-bottom:6px}
+
+  /* detail sheet */
+  .scrim{position:fixed;inset:0;background:rgba(43,39,49,.42);backdrop-filter:blur(2px);z-index:80;display:none;align-items:flex-end;justify-content:center}
+  .scrim.show{display:flex}@media(min-width:560px){.scrim.show{align-items:center}}
+  .sheet{background:var(--paper);width:100%;max-width:520px;border-radius:22px 22px 0 0;max-height:90vh;overflow:auto;animation:up .25s ease;padding-bottom:env(safe-area-inset-bottom)}
+  @media(min-width:560px){.sheet{border-radius:22px}}
+  @keyframes up{from{transform:translateY(24px);opacity:.6}to{transform:translateY(0);opacity:1}}
+  .sheet .top{position:relative;aspect-ratio:16/9;overflow:hidden;border-radius:22px 22px 0 0}
+  .sheet .top .wash{position:absolute;inset:0}.sheet .top .glyph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:60px;opacity:.9}
+  .sheet .top img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .sheet .pad{padding:18px}
+  .field{margin-bottom:13px}
+  .field label{display:block;font-size:11px;font-weight:700;color:var(--ink-soft);letter-spacing:.06em;margin-bottom:5px}
+  .field input,.field textarea,.field select{width:100%;border:1px solid var(--line);background:var(--card);border-radius:10px;padding:10px 11px;font-family:inherit;font-size:14px;color:var(--ink)}
+  .field textarea{resize:vertical;min-height:62px;line-height:1.6}
+  .field input:focus,.field textarea:focus,.field select:focus{outline:2px solid var(--brand);border-color:transparent}
+  .two{display:flex;gap:10px}.two>div{flex:1}
+  .dtags{display:flex;flex-wrap:wrap;gap:6px;margin:-4px 0 13px}
+  .dtags span{font-size:11px;font-weight:700;color:var(--brand);background:#F0EBF2;border-radius:7px;padding:3px 9px}
+  .starrow{display:flex;align-items:center;gap:9px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:13px;cursor:pointer}
+  .starrow.on{border-color:var(--star);background:#FCF6E9}
+  .starrow .lbl{font-size:13.5px;font-weight:700}
+  .actions{display:flex;gap:10px;margin-top:4px}
+  .btn-ghost{flex:1;background:var(--card);color:var(--ink);border:1px solid var(--line)}
+  .btn-open{flex:1.4;text-align:center;text-decoration:none}
+  .btn,.btn-open,.btn-ghost{height:44px;line-height:44px}
+  .del{background:none;border:0;color:#B4526B;font-family:inherit;font-weight:700;font-size:13px;cursor:pointer;display:block;margin:13px auto 0;padding:6px}
+  .note{background:#fff;border:1px solid var(--line);border-radius:11px;padding:11px 13px;font-size:12px;color:var(--ink-soft);line-height:1.7;margin-bottom:14px}
+  .note b{color:var(--brand)}
+  .src{font-size:11px;color:var(--ink-faint);font-weight:700;margin-bottom:12px}
+  .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:11px 18px;border-radius:999px;font-size:13px;font-weight:700;z-index:100;opacity:0;transition:.25s;pointer-events:none;max-width:90%}
+  .toast.show{opacity:1;bottom:34px}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="head-row">
+      <div class="brand">しおり</div>
+      <div class="spacer"></div>
+      <div class="sync" id="sync"><span class="led"></span><span id="sync-t">ローカル</span></div>
+      <button class="icon-btn" id="searchbtn" title="検索"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4-4"/></svg></button>
+      <button class="icon-btn" id="viewbtn" title="表示切替"><svg id="vicon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></button>
+    </div>
+    <div class="add-row">
+      <input id="url" placeholder="リンクを貼って追加">
+      <button class="btn" id="add">追加</button>
+    </div>
+    <div id="searchwrap" style="display:none;padding-bottom:8px">
+      <input id="search" style="width:100%;border:1px solid var(--line);background:var(--card);border-radius:11px;padding:10px 12px;font-family:inherit;font-size:14px" placeholder="タイトル・メモを検索">
+    </div>
+    <div class="grow" id="genres"></div>
+    <div class="refbar" id="refbar">
+      <span class="ctx" id="ctx"></span>
+      <button class="refbtn" id="refbtn" style="display:none">絞り込む <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="m6 9 6 6 6-6"/></svg></button>
+    </div>
+    <div class="panel" id="panel">
+      <div id="subwrap"><div class="prow" id="subs"></div></div>
+      <div id="tagwrap"><div class="lab">タグで絞り込み</div><div class="prow" id="tags"></div></div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap"><div id="board"></div></main>
+
+<div class="scrim" id="scrim"><div class="sheet" id="sheet"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+const API_BASE="", API_TOKEN="";
+
+const GENRES=[
+ {id:"beauty",name:"ビューティー",hex:"#C56B8A",glyph:"💄",subs:["メイク方法","コスメ","スキンケア","ヘア","ネイル"],
+   kw:["コスメ","cosme","化粧品","メイク","makeup","リップ","口紅","ファンデ","下地","アイシャドウ","チーク","マスカラ","スキンケア","化粧水","美容液","美肌","パック","洗顔","日焼け止め","髪","ヘア","hair","ネイル","nail","まつげ","マツエク","@cosme"]},
+ {id:"treat",name:"施術・美容医療",hex:"#6E86B6",glyph:"💆",subs:["脱毛","ハイフ・注射","エステ"],
+   kw:["施術","脱毛","ハイフ","注射","ボトックス","ヒアルロン","エステ","クリニック","clinic","美容外科","整形","皮膚科","医療","痩身","小顔"]},
+ {id:"out",name:"おでかけ",hex:"#4E8D7C",glyph:"📍",subs:["カフェ・ごはん","旅行・ホテル","スポット"],
+   kw:["カフェ","cafe","レストラン","ごはん","ランチ","ディナー","tabelog","retty","食べ","旅行","travel","ホテル","hotel","旅館","温泉","観光","スポット","公園","展示","maps.app","google.com/maps"]},
+ {id:"fashion",name:"ファッション・モノ",hex:"#B06A54",glyph:"🛍️",subs:["服","小物・雑貨"],
+   kw:["服","コーデ","ファッション","fashion","ニット","ワンピ","スカート","バッグ","財布","靴","アクセ","ピアス","zozo","uniqlo","gu","雑貨","小物","欲しい","購入"]},
+ {id:"life",name:"暮らし",hex:"#7C8A5A",glyph:"🏠",subs:["インテリア","収納","掃除","家事のコツ","ものづくり・DIY"],
+   kw:["インテリア","interior","部屋","収納","片づけ","片付け","掃除","そうじ","家事","暮らし","ライフハック","diy","3dプリンタ","3dプリンター","工作","リメイク","ハンドメイド","レジン","木工"]},
+ {id:"other",name:"その他",hex:"#9A8FA6",glyph:"🔖",subs:[],kw:[]},
+];
+const gById=id=>GENRES.find(g=>g.id===id)||GENRES[GENRES.length-1];
+
+const SUB_KW={
+ "メイク方法":["メイク方法","塗り方","やり方","how to","チュートリアル","テク","仕込み","ベースメイク","アイメイク","囲み"],
+ "コスメ":["コスメ","リップ","口紅","ファンデ","下地","アイシャドウ","チーク","マスカラ","新作","スウォッチ","デパコス","プチプラ"],
+ "スキンケア":["スキンケア","化粧水","美容液","パック","洗顔","保湿","毛穴","美白","日焼け"],
+ "ヘア":["髪","ヘア","hair","ヘアアレンジ","前髪","トリートメント","カラー"],"ネイル":["ネイル","nail","マツエク","まつげ"],
+ "脱毛":["脱毛"],"ハイフ・注射":["ハイフ","注射","ボトックス","ヒアルロン"],"エステ":["エステ","痩身","マッサージ","小顔"],
+ "カフェ・ごはん":["カフェ","cafe","レストラン","ごはん","ランチ","ディナー","tabelog","食べ","スイーツ","パン"],
+ "旅行・ホテル":["旅行","travel","ホテル","hotel","旅館","温泉","宿"],"スポット":["スポット","観光","公園","展示","美術館","水族館"],
+ "服":["服","コーデ","ニット","ワンピ","スカート","パンツ","アウター"],"小物・雑貨":["バッグ","財布","靴","アクセ","ピアス","雑貨","小物","帽子"],
+ "インテリア":["インテリア","interior","部屋","家具","ソファ","照明"],"収納":["収納","片づけ","片付け","整理"],
+ "掃除":["掃除","そうじ","クリーニング","洗剤"],"家事のコツ":["家事","ライフハック","時短","料理","作り置き"],
+ "ものづくり・DIY":["diy","3dプリンタ","3dプリンター","工作","リメイク","ハンドメイド","レジン","木工","刺繍"],
+};
+const PLACES=["渋谷","新宿","恵比寿","代官山","中目黒","表参道","原宿","銀座","品川","目黒","自由が丘","下北沢","吉祥寺","浅草","上野","池袋","二子玉川","六本木","横浜","みなとみらい","鎌倉","川崎","逗子","葉山","江ノ島","湘南","京都","大阪","福岡","沖縄","北海道"];
+const MAKER=["3dプリンタ","3dプリンター","工作","リメイク","レジン","刺繍","木工","ハンドメイド"];
+const EXTRA=["プチプラ","デパコス","韓国","無印","IKEA","ニトリ","作り置き","時短"];
+const TAG_DICT=[...new Set([...PLACES,...MAKER,...EXTRA])];
+function extractTags(t){t=t||"";const low=t.toLowerCase();const f=[];for(const w of TAG_DICT){if(t.includes(w)||low.includes(w.toLowerCase())){if(!f.includes(w))f.push(w);}}return f.slice(0,4);}
+function detectGenre(t){t=(t||"").toLowerCase();let best="other",bs=0;for(const g of GENRES){let s=0;for(const k of g.kw)if(t.includes(k.toLowerCase()))s++;if(s>bs){bs=s;best=g.id;}}return best;}
+function detectSub(t,gid){const g=gById(gid);if(!g.subs.length)return"";let best="",bs=0;for(const sub of g.subs){const kws=SUB_KW[sub]||[sub];let s=0;for(const k of kws)if((t||"").toLowerCase().includes(k.toLowerCase()))s++;if(s>bs){bs=s;best=sub;}}return best;}
+
+const KEY="shiori:items:v2";
+function cacheLoad(){try{const r=localStorage.getItem(KEY);if(r)return JSON.parse(r);}catch(e){}return null;}
+function cacheSave(x){try{localStorage.setItem(KEY,JSON.stringify(x));}catch(e){}}
+const syncOn=!!API_BASE;
+async function api(p,o={}){const r=await fetch(API_BASE+p,{...o,headers:{"Content-Type":"application/json","Authorization":"Bearer "+API_TOKEN,...(o.headers||{})}});if(!r.ok)throw new Error("api "+r.status);return r.json();}
+const toServer=i=>({id:i.id,url:i.url,domain:i.domain,title:i.title,caption:i.caption,category:i.genre,subcategory:i.sub||"",image:i.img,star:i.star?1:0,tags:(i.tags||[]).join(","),auto:i.auto?1:0,created_at:i.t});
+const fromServer=r=>({id:r.id,url:r.url,domain:r.domain,title:r.title,caption:r.caption,genre:r.category||"other",sub:r.subcategory||"",img:r.image||"",star:!!r.star,tags:r.tags?String(r.tags).split(",").filter(Boolean):[],auto:!!r.auto,t:r.created_at||Date.now()});
+function setSync(s){const el=document.getElementById("sync"),t=document.getElementById("sync-t");el.className="sync "+(s==="local"?"":s);t.textContent=s==="on"?"同期中":s==="off"?"オフライン":"ローカル";}
+
+function domainOf(u){try{return new URL(u).hostname.replace(/^www\./,"");}catch(e){return"";}}
+function titleFromDomain(d){if(!d)return"無題のメモ";const b=d.split(".")[0];return b.charAt(0).toUpperCase()+b.slice(1)+" の投稿";}
+function mix(hex,ratio){/* blend toward paper #F4F1EC */const p=[244,241,236];let n=parseInt(hex.slice(1),16);const c=[(n>>16)&255,(n>>8)&255,n&255];const o=c.map((v,i)=>Math.round(v*ratio+p[i]*(1-ratio)));return"#"+o.map(v=>v.toString(16).padStart(2,"0")).join("");}
+function washFor(gid){const g=gById(gid);return`linear-gradient(145deg, ${mix(g.hex,.28)} 0%, ${mix(g.hex,.16)} 100%)`;}
+function esc(s){return(s||"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));}
+function toast(m){const t=document.getElementById("toast");t.textContent=m;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),1900);}
+const STAR=on=>`<svg viewBox="0 0 24 24" fill="${on?'var(--star)':'none'}" stroke="${on?'var(--star)':'#B3AAB8'}" stroke-width="2"><path d="M12 3.5l2.6 5.3 5.9.5-4.5 3.9 1.4 5.7L12 21.6 6.6 24.9l1.4-5.7L3.5 15.3l5.9-.5z" transform="translate(0,-1.5)"/></svg>`;
+
+let items=[],view="gallery",genre="all",sub="all",tag="all",starOnly=false,q="",panelOpen=false;
+
+function seed(){const n=Date.now();const mk=o=>({auto:true,img:"",star:false,...o,tags:extractTags((o.title||"")+" "+(o.caption||""))});return[
+ mk({id:"s1",url:"https://instagram.com/p/a",domain:"instagram.com",title:"代官山の隠れ家カフェ",genre:"out",sub:"カフェ・ごはん",caption:"ネルドリップの深煎りが名物。代官山、土日10時。",t:n-1000}),
+ mk({id:"s2",url:"https://instagram.com/p/b",domain:"instagram.com",title:"毛穴が消える下地の塗り方",genre:"beauty",sub:"メイク方法",caption:"少量を内から外へ。ベースメイクの仕込み。",t:n-2000,star:true}),
+ mk({id:"s3",url:"https://tabelog.com/x",domain:"tabelog.com",title:"横浜みなとみらいの夜景レストラン",genre:"out",sub:"カフェ・ごはん",caption:"横浜。記念日に。予約必須。",t:n-3000,star:true}),
+ mk({id:"s4",url:"https://ex-clinic.jp/hifu",domain:"ex-clinic.jp",title:"ハイフ 全顔+首 初回29,800円",genre:"treat",sub:"ハイフ・注射",caption:"ダウンタイム無し。渋谷院。",t:n-4000}),
+ mk({id:"s5",url:"https://zozo.jp/x",domain:"zozo.jp",title:"欲しいニット グレージュ",genre:"fashion",sub:"服",caption:"¥8,900。とろみ素材。",t:n-5000,star:true}),
+ mk({id:"s6",url:"https://instagram.com/p/c",domain:"instagram.com",title:"3Dプリンタで作る小物収納",genre:"life",sub:"ものづくり・DIY",caption:"3Dプリンタ。データ配布あり。",t:n-6000}),
+ mk({id:"s7",url:"https://instagram.com/p/d",domain:"instagram.com",title:"無印の収納ボックス活用術",genre:"life",sub:"収納",caption:"無印。クローゼットの片づけ。",t:n-7000}),
+ mk({id:"s8",url:"https://cosme.net/x",domain:"cosme.net",title:"新作リップ 韓国コスメ",genre:"beauty",sub:"コスメ",caption:"韓国。ブラウンベース。#02人気。",t:n-8000,star:true}),
+ mk({id:"s9",url:"https://instagram.com/p/e",domain:"instagram.com",title:"渋谷の韓国スイーツカフェ",genre:"out",sub:"カフェ・ごはん",caption:"渋谷。韓国。トッケビ系。並ぶ。",t:n-9000}),
+ mk({id:"s10",url:"https://instagram.com/p/f",domain:"instagram.com",title:"前髪の巻き方",genre:"beauty",sub:"ヘア",caption:"32mmで。仕上げにスプレー。",t:n-10000}),
+ mk({id:"s11",url:"https://instagram.com/p/g",domain:"instagram.com",title:"IKEAで作る収納DIY",genre:"life",sub:"ものづくり・DIY",caption:"IKEA。リメイク。工作。",t:n-11000}),
+ mk({id:"s12",url:"https://uniqlo.com/x",domain:"uniqlo.com",title:"秋の羽織りアウター",genre:"fashion",sub:"服",caption:"軽い。通勤にも。",t:n-12000,star:true}),
+];}
+
+function renderGenres(){
+  const el=document.getElementById("genres");const c={all:items.length};GENRES.forEach(g=>c[g.id]=items.filter(i=>i.genre===g.id).length);
+  const starN=items.filter(i=>i.star).length;
+  let h=`<button class="chip ${genre==='all'&&!starOnly?'on':''}" data-g="all">すべて <span class="n">${c.all}</span></button>`;
+  h+=`<button class="chip star ${starOnly?'on':''}" data-star="1">★ ほしい <span class="n">${starN}</span></button>`;
+  GENRES.forEach(g=>{const on=genre===g.id&&!starOnly;h+=`<button class="chip ${on?'on':''}" data-g="${g.id}" style="${on?`background:${g.hex}`:''}"><span class="dot" style="background:${g.hex}"></span>${g.name} <span class="n">${c[g.id]}</span></button>`;});
+  el.innerHTML=h;
+  el.querySelectorAll("[data-g]").forEach(b=>b.onclick=()=>{genre=b.dataset.g;starOnly=false;sub="all";tag="all";panelOpen=false;renderAll();});
+  el.querySelector("[data-star]").onclick=()=>{starOnly=!starOnly;if(starOnly){genre="all";}sub="all";tag="all";panelOpen=false;renderAll();};
+}
+function currentScope(){return items.filter(i=>(starOnly?i.star:(genre==='all'||i.genre===genre)) && (sub==='all'||i.sub===sub));}
+function renderRefine(){
+  const g=GENRES.find(x=>x.id===genre);
+  const hasSubs=!starOnly&&g&&g.subs.length;
+  const scope=items.filter(i=>starOnly?i.star:(genre==='all'||i.genre===genre));
+  const tagCounts={};scope.forEach(i=>(i.tags||[]).forEach(t=>tagCounts[t]=(tagCounts[t]||0)+1));
+  const hasTags=Object.keys(tagCounts).length>0;
+  const ctx=document.getElementById("ctx"),refbtn=document.getElementById("refbtn"),panel=document.getElementById("panel");
+  const total=currentScope().length;
+  const name=starOnly?"★ ほしい":(genre==='all'?"すべて":g.name);
+  ctx.textContent=`${name}${sub!=='all'?' ・ '+sub:''}${tag!=='all'?' ・ '+tag:''} ・ ${visible().length}件`;
+  if(hasSubs||hasTags){refbtn.style.display="";refbtn.classList.toggle("open",panelOpen);}
+  else{refbtn.style.display="none";panelOpen=false;}
+  panel.classList.toggle("open",panelOpen);
+  // subs
+  const subwrap=document.getElementById("subwrap"),subsEl=document.getElementById("subs");
+  if(hasSubs){subwrap.style.display="";const pool=items.filter(i=>i.genre===genre);
+    let sh=`<button class="schip ${sub==='all'?'on':''}" data-s="all">全部</button>`;
+    g.subs.forEach(s=>{const nn=pool.filter(i=>i.sub===s).length;if(!nn)return;sh+=`<button class="schip ${sub===s?'on':''}" data-s="${esc(s)}">${esc(s)} <span class="n">${nn}</span></button>`;});
+    subsEl.innerHTML=sh;subsEl.querySelectorAll("[data-s]").forEach(b=>b.onclick=()=>{sub=b.dataset.s;tag="all";renderAll();});
+  }else subwrap.style.display="none";
+  // tags
+  const tagwrap=document.getElementById("tagwrap"),tagsEl=document.getElementById("tags");
+  const pool2=currentScope();const tc={};pool2.forEach(i=>(i.tags||[]).forEach(t=>tc[t]=(tc[t]||0)+1));
+  const tagList=Object.keys(tc).sort((a,b)=>tc[b]-tc[a]);
+  if(tagList.length){tagwrap.style.display="";
+    let th=`<button class="schip ${tag==='all'?'on':''}" data-t="all">なし</button>`;
+    tagList.forEach(t=>{th+=`<button class="schip ${tag===t?'on':''}" data-t="${esc(t)}">${esc(t)} <span class="n">${tc[t]}</span></button>`;});
+    tagsEl.innerHTML=th;tagsEl.querySelectorAll("[data-t]").forEach(b=>b.onclick=()=>{tag=b.dataset.t;renderBoard();renderRefine();});
+  }else tagwrap.style.display="none";
+}
+document.getElementById("refbtn").onclick=()=>{panelOpen=!panelOpen;renderRefine();};
+
+function visible(){return items.filter(i=>{
+  if(starOnly&&!i.star)return false;
+  if(!starOnly&&genre!=="all"&&i.genre!==genre)return false;
+  if(sub!=="all"&&i.sub!==sub)return false;
+  if(tag!=="all"&&!(i.tags||[]).includes(tag))return false;
+  if(q&&!(i.title+" "+i.caption+" "+i.domain+" "+(i.tags||[]).join(" ")).toLowerCase().includes(q.toLowerCase()))return false;
+  return true;}).sort((a,b)=>b.t-a.t);}
+
+function cardHTML(i){const g=gById(i.genre);
+  const th=i.img?`<img src="${esc(i.img)}" onerror="this.style.display='none'">`:`<div class="wash" style="background:${washFor(i.genre)}"></div><div class="glyph">${g.glyph}</div>`;
+  const cap=view==='list'&&i.caption?`<div class="cap">${esc(i.caption)}</div>`:"";
+  return`<div class="card" data-id="${i.id}"><div class="thumb"><button class="starbtn" data-star="${i.id}">${STAR(i.star)}</button>${th}</div>
+   <div class="body"><div class="glabel"><span class="dot" style="background:${g.hex}"></span>${i.sub||g.name}</div>
+   <div class="title">${esc(i.title)}</div>${cap}</div></div>`;}
+function renderBoard(){
+  const b=document.getElementById("board");const list=visible();
+  if(!list.length){b.innerHTML=`<div class="${view==='gallery'?'gallery':'list'}"><div class="empty"><div class="big">${starOnly?"★はまだありません":"まだ何もありません"}</div><div>${starOnly?"カードの★を押すと集まります":"上にリンクを貼って追加してみて"}</div></div></div>`;return;}
+  b.innerHTML=`<div class="${view==='gallery'?'gallery':'list'}">${list.map(cardHTML).join("")}</div>`;
+  b.querySelectorAll(".card").forEach(el=>el.onclick=()=>openSheet(el.dataset.id));
+  b.querySelectorAll("[data-star]").forEach(btn=>btn.onclick=e=>{e.stopPropagation();toggleStar(btn.dataset.star);});
+}
+function renderAll(){renderGenres();renderRefine();renderBoard();}
+
+async function toggleStar(id){const i=items.find(x=>x.id===id);if(!i)return;i.star=!i.star;cacheSave(items);renderAll();if(syncOn){try{await api("/items/"+id,{method:"PUT",body:JSON.stringify(toServer(i))});}catch(e){setSync("off");}}}
+
+async function addFromUrl(url,silent){
+  url=(url||"").trim();if(!url)return;if(!/^https?:\/\//i.test(url))url="https://"+url;
+  const domain=domainOf(url),base=url+" "+domain;const gid=detectGenre(base),subv=detectSub(base,gid);
+  const item={id:"i"+Date.now(),url,domain,title:titleFromDomain(domain),caption:"",genre:gid,sub:subv,auto:true,img:"",star:false,tags:extractTags(base),t:Date.now()};
+  items.push(item);cacheSave(items);renderAll();
+  if(silent)toast("「"+gById(gid).name+"」に保存しました");else openSheet(item.id,true);
+  if(syncOn){try{await api("/items",{method:"POST",body:JSON.stringify(toServer(item))});setSync("on");}catch(e){setSync("off");toast("オフライン：後で同期");}}
+}
+function openSheet(id,isNew){
+  const i=items.find(x=>x.id===id);if(!i)return;const g=gById(i.genre);
+  const scrim=document.getElementById("scrim"),sheet=document.getElementById("sheet");
+  const top=i.img?`<img src="${esc(i.img)}" onerror="this.style.display='none'">`:`<div class="wash" style="background:${washFor(i.genre)}"></div><div class="glyph">${g.glyph}</div>`;
+  const subOpt=g.subs.length?`<div class="field"><label>子カテゴリ</label><select id="f-sub"><option value="">（なし）</option>${g.subs.map(s=>`<option ${s===i.sub?"selected":""}>${s}</option>`).join("")}</select></div>`:"";
+  sheet.innerHTML=`<div class="top">${top}</div><div class="pad">
+    ${isNew?`<div class="note">🔗 <b>${esc(i.domain)}</b> を保存しました。ジャンル・子カテゴリを直したり要点を書き足せます。${(i.tags||[]).length?"<br>拾ったタグ："+i.tags.map(t=>"「"+esc(t)+"」").join(" "):""}</div>`:""}
+    <div class="src">${esc(i.domain||"メモ")}</div>
+    <div class="starrow ${i.star?'on':''}" id="f-starrow"><span style="width:20px;height:20px;display:inline-flex">${STAR(i.star)}</span><span class="lbl">ほしい・やりたい（★）</span></div>
+    <div class="field"><label>タイトル</label><input id="f-title" value="${esc(i.title)}"></div>
+    <div class="field"><label>メモ・要点</label><textarea id="f-cap" placeholder="場所の名前、値段、理由など…">${esc(i.caption)}</textarea></div>
+    <div class="two"><div class="field"><label>ジャンル</label><select id="f-genre">${GENRES.map(gg=>`<option value="${gg.id}" ${gg.id===i.genre?"selected":""}>${gg.glyph} ${gg.name}</option>`).join("")}</select></div><div id="subslot">${subOpt}</div></div>
+    <div class="field"><label>画像URL（任意）</label><input id="f-img" value="${esc(i.img)}" placeholder="https://…/photo.jpg"></div>
+    <div class="actions"><button class="btn btn-ghost" id="f-save">保存</button><a class="btn btn-open" href="${esc(i.url)}" target="_blank" rel="noopener">開く ↗</a></div>
+    <button class="del" id="f-del">削除</button></div>`;
+  scrim.classList.add("show");
+  let st=i.star;
+  document.getElementById("f-starrow").onclick=function(){st=!st;this.classList.toggle("on",st);this.querySelector("span").innerHTML=STAR(st);};
+  document.getElementById("f-genre").onchange=function(){const gg=gById(this.value);document.getElementById("subslot").innerHTML=gg.subs.length?`<div class="field"><label>子カテゴリ</label><select id="f-sub"><option value="">（なし）</option>${gg.subs.map(s=>`<option>${s}</option>`).join("")}</select></div>`:"";};
+  document.getElementById("f-save").onclick=async()=>{
+    i.title=document.getElementById("f-title").value||i.title;i.caption=document.getElementById("f-cap").value;
+    const ng=document.getElementById("f-genre").value;if(ng!==i.genre){i.genre=ng;i.auto=false;}
+    const se=document.getElementById("f-sub");i.sub=se?se.value:"";i.img=document.getElementById("f-img").value.trim();i.star=st;
+    i.tags=extractTags(i.title+" "+i.caption);cacheSave(items);renderAll();closeSheet();
+    if(syncOn){try{await api("/items/"+i.id,{method:"PUT",body:JSON.stringify(toServer(i))});}catch(e){setSync("off");}}
+  };
+  document.getElementById("f-del").onclick=async()=>{items=items.filter(x=>x.id!==i.id);cacheSave(items);renderAll();closeSheet();if(syncOn){try{await api("/items/"+id,{method:"DELETE"});}catch(e){setSync("off");}}};
+}
+function closeSheet(){document.getElementById("scrim").classList.remove("show");}
+document.getElementById("scrim").onclick=e=>{if(e.target.id==="scrim")closeSheet();};
+document.getElementById("add").onclick=()=>{const el=document.getElementById("url");addFromUrl(el.value);el.value="";};
+document.getElementById("url").addEventListener("keydown",e=>{if(e.key==="Enter")document.getElementById("add").click();});
+document.getElementById("searchbtn").onclick=function(){const w=document.getElementById("searchwrap");const show=w.style.display==="none";w.style.display=show?"":"none";this.classList.toggle("on",show);if(show)document.getElementById("search").focus();else{q="";document.getElementById("search").value="";renderBoard();renderRefine();}};
+document.getElementById("search").addEventListener("input",e=>{q=e.target.value;renderBoard();renderRefine();});
+document.getElementById("viewbtn").onclick=function(){view=view==='gallery'?'list':'gallery';
+  document.getElementById("vicon").innerHTML=view==='gallery'?'<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>':'<line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>';
+  renderBoard();};
+
+(async function boot(){
+  items=cacheLoad()||[];if(items.length===0&&!syncOn){items=seed();cacheSave(items);}
+  setSync(syncOn?"on":"local");renderAll();
+  if(syncOn){try{const s=await api("/items");items=(s||[]).map(fromServer);cacheSave(items);setSync("on");renderAll();}catch(e){setSync("off");}}
+  const p=new URLSearchParams(location.search);const shared=p.get("url")||p.get("text")||p.get("link");
+  if(shared){await addFromUrl(shared,true);history.replaceState(null,"",location.pathname);}
+})();
+</script>
+</body>
+</html>
