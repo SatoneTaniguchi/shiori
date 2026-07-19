@@ -362,7 +362,14 @@ document.getElementById("viewbtn").onclick=function(){view=view==='gallery'?'lis
 (async function boot(){
   items=cacheLoad()||[];if(items.length===0&&!syncOn){items=seed();cacheSave(items);}
   setSync(syncOn?"on":"local");renderAll();
-  if(syncOn){try{const s=await api("/items");items=(s||[]).map(fromServer);cacheSave(items);setSync("on");renderAll();}catch(e){setSync("off");}}
+  if(syncOn){
+    try{const s=await api("/items");items=(s||[]).map(fromServer);cacheSave(items);setSync("on");renderAll();}catch(e){setSync("off");}
+    // 開いた時にも裏処理をキック（Cronと併用）
+    try{ await api("/process",{method:"POST"});
+      // 少し待って、処理済みを取り込み直す
+      setTimeout(async()=>{ try{const s2=await api("/items");items=(s2||[]).map(fromServer);cacheSave(items);renderAll();}catch(e){} }, 8000);
+    }catch(e){}
+  }
   const p=new URLSearchParams(location.search);const shared=p.get("url")||p.get("text")||p.get("link");
   if(shared){await addFromUrl(shared,true);history.replaceState(null,"",location.pathname);}
 })();
